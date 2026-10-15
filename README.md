@@ -1,21 +1,37 @@
-# Employee Management
+# Employee Management System
 
-This is a simple app to manage employee records. An admin can add, view, edit and delete a record. The admin can also search for employees and filter the list.
+A web app for managing employee records. It has pages to add an employee, view details, edit a record and delete a record. Employee data is saved in PostgreSQL.
+
+![Employee list](docs/screenshots/employee-list.png)
+
+[Run the app](#run-with-docker) · [API guide](#api-guide) · [Tests](#run-the-tests) · [Screenshots](#screenshots)
 
 ## Features
 
-- Add, view, edit and delete employees.
-- Save all nine fields given in the assignment.
-- Search by name or email.
-- Filter by department and status.
-- Show the employee list in pages.
-- Ask before deleting a record.
-- Show an error if a field is wrong or missing.
-- Stop the same email or employee ID from being used twice.
-- Save records in PostgreSQL.
-- Download the list as a CSV file.
-- View and try the APIs in Swagger UI or Postman.
-- Run the app with Docker Compose.
+- Add, view, edit and delete employee records.
+- Search by name or email and filter by department or status.
+- Split long lists into pages, with a choice of rows per page.
+- Ask for confirmation before deleting a record.
+- Show clear errors for missing fields, wrong values and repeated emails or employee IDs.
+- Show employee counts and department counts.
+- Download matching records as a CSV file.
+- Use the app on a computer or phone.
+
+## Employee details
+
+Each employee record contains these fields:
+
+| Field | Example |
+| --- | --- |
+| Employee ID | `EMP-101` |
+| Full name | Ananya Rao |
+| Email address | `ananya.rao@example.com` |
+| Phone number | `+91 98765 43210` |
+| Department | Engineering |
+| Designation | Backend Developer |
+| Date of joining | `2025-08-12` |
+| Annual salary in INR | `650000.00` |
+| Employment status | Active or Inactive |
 
 ## Tools used
 
@@ -25,32 +41,40 @@ This is a simple app to manage employee records. An admin can add, view, edit an
 | Database | PostgreSQL 17, Flyway |
 | Frontend | HTML, CSS and JavaScript |
 | Tests | JUnit 5, Mockito, MockMvc, Playwright |
-| Build and API guide | Maven, springdoc OpenAPI |
+| Build | Maven |
+| API guide | Swagger UI and OpenAPI |
 
 The frontend files are in `src/main/resources/static`. Spring Boot runs the frontend and backend together.
 
-## Start with Docker
+## Run with Docker
 
-Install Docker Desktop and start it. Docker includes the tools needed to run the app. You do not need to install Java, Maven or Node.js for this method.
+You need Git and Docker Desktop with Docker Compose. Start Docker Desktop, then open a terminal and run:
 
-1. Open a terminal in this project folder.
-2. Run:
+```sh
+git clone https://github.com/aryan8434/employee-management-system.git
+cd employee-management-system
+docker compose up --build -d
+```
 
-   ```sh
-   docker compose up --build -d
-   ```
+If you downloaded the source ZIP, extract it and run the Docker command inside the folder that contains `compose.yaml`.
 
-3. The first build needs the internet. It may take a few minutes. To check if the app has started, run:
+The first build needs the internet and may take a few minutes. Java and Maven are included in the Docker build. Node.js is not needed to run the app. Check the startup log with:
 
-   ```sh
-   docker compose logs -f app
-   ```
+```sh
+docker compose logs -f app
+```
 
-   Wait until you see `Started EmployeeApplication`. Then press Ctrl+C. This closes the log view. The app keeps running.
+When you see `Started EmployeeApplication`, open [http://localhost:8080](http://localhost:8080). Press Ctrl+C to leave the log view. The app keeps running.
 
-4. Open [http://localhost:8080](http://localhost:8080).
+Docker creates the database, and Flyway creates the tables. The employee list is empty at first. Records stay in the database volume when you stop the app.
 
-The app creates the database tables on the first start. The employee list is empty at first. Docker keeps the saved records when you stop the app.
+Useful local addresses:
+
+| Page | Address |
+| --- | --- |
+| App | [localhost:8080](http://localhost:8080) |
+| Swagger UI | [localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
+| OpenAPI JSON | [localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) |
 
 To stop the app and keep the data:
 
@@ -78,14 +102,16 @@ Refresh the page to see the sample employees.
 
 ## Run with local Java and Maven
 
-For this method, install JDK 17 or later and Maven 3.6.3 or later. You also need PostgreSQL 17. You can use Docker to run PostgreSQL:
+For this method, install JDK 17 or later and Maven 3.6.3 or later. You also need PostgreSQL 17. You can use Docker to run PostgreSQL.
+
+If the Docker app is already running, stop it first with `docker compose stop app`. Then run:
 
 ```sh
 docker compose up -d db
 mvn spring-boot:run
 ```
 
-If the Docker app is already running, stop it first with `docker compose stop app`. Then run the commands above. Both apps use port 8080, so they cannot run on that port at the same time.
+The Docker app and the local Maven app both use port 8080. Run one app at a time on that port.
 
 Default database settings:
 
@@ -129,8 +155,8 @@ Docker Compose reads the `.env` file. When you run Maven yourself, set the value
 
 - Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
-- Postman collection: `docs/employee-management.postman_collection.json`
-- Sample requests: `docs/api-examples.http`
+- [Postman collection](docs/employee-management.postman_collection.json)
+- [Sample API requests](docs/api-examples.http)
 
 | Method | Path | Use |
 | --- | --- | --- |
@@ -170,6 +196,16 @@ The API returns `400` for wrong input and `404` if a record is not found. It ret
 
 ## Run the tests
 
+The completed local check on 15 October 2026 passed all 38 tests. It used a fresh copy of the source ZIP and a new PostgreSQL database.
+
+| Test group | Passed |
+| --- | ---: |
+| Service tests | 14 |
+| API tests | 12 |
+| PostgreSQL tests | 8 |
+| Browser tests | 4 |
+| **Total** | **38** |
+
 Service and API tests do not need a database:
 
 ```sh
@@ -208,7 +244,7 @@ npm run test:ui
 
 If the app uses a different address, set `APP_URL` to that address. For example, use `http://localhost:8086`. Browser tests add records for testing and delete them after each test.
 
-See `docs/test-results.md` for the checks run on this version.
+See the [test notes](docs/test-results.md) for the checks and report locations.
 
 ## Project files
 
@@ -231,16 +267,17 @@ The controller receives an API request. The service checks the employee details.
 
 ## Screenshots
 
-The screenshots show the running app with the sample records.
+The main screenshot above shows the employee list. These images show the other pages and the phone layout:
 
-![Employee list](docs/screenshots/employee-list.png)
-![Add employee form](docs/screenshots/add-employee.png)
-![Edit employee form](docs/screenshots/edit-employee.png)
-![Employee details](docs/screenshots/employee-details.png)
-![Phone view](docs/screenshots/mobile-list.png)
+- [Add employee form](docs/screenshots/add-employee.png)
+- [Edit employee form](docs/screenshots/edit-employee.png)
+- [Employee details](docs/screenshots/employee-details.png)
+- [Phone view](docs/screenshots/mobile-list.png)
 
 ## Notes
 
-This app runs on your computer. It has no login page. The CSV export handles commas and quotes in values. It also adds a single quote before text that could be read as a spreadsheet formula.
+This is a local app with no login page. Departments are entered on the employee form, and saved department names appear in the filter. There is no separate department management page.
+
+The CSV export handles commas and quotes in values. It also adds a single quote before text that could be read as a spreadsheet formula.
 
 Tool references: [Spring Boot setup](https://docs.spring.io/spring-boot/3.5/system-requirements.html) and [springdoc compatibility](https://springdoc.org/v2/).
