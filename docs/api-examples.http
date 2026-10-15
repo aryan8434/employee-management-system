@@ -1,0 +1,55 @@
+@baseUrl = http://localhost:8080
+@recordId = 1
+
+### List employees
+GET {{baseUrl}}/api/employees?page=0&size=10
+
+### Search and filter together
+GET {{baseUrl}}/api/employees?search=rao&department=Engineering&status=ACTIVE&page=0&size=5
+
+### Add an employee. Use the returned numeric id in later requests.
+POST {{baseUrl}}/api/employees
+Content-Type: application/json
+
+{
+  "employeeId": "EMP-200",
+  "fullName": "Amit Shah",
+  "email": "amit.shah@example.com",
+  "phone": "+91 98765 43000",
+  "department": "Engineering",
+  "designation": "Backend Developer",
+  "dateOfJoining": "2025-08-12",
+  "salary": 600000.00,
+  "status": "ACTIVE"
+}
+
+### View one employee
+GET {{baseUrl}}/api/employees/{{recordId}}
+
+### Edit an employee
+PUT {{baseUrl}}/api/employees/{{recordId}}
+Content-Type: application/json
+
+{
+  "employeeId": "EMP-200",
+  "fullName": "Amit Shah",
+  "email": "amit.shah@example.com",
+  "phone": "+91 98765 43000",
+  "department": "Engineering",
+  "designation": "Software Engineer",
+  "dateOfJoining": "2025-08-12",
+  "salary": 650000.00,
+  "status": "INACTIVE"
+}
+
+### List saved departments
+GET {{baseUrl}}/api/employees/departments
+
+### Count employees
+GET {{baseUrl}}/api/employees/summary
+
+### Export matching employees
+GET {{baseUrl}}/api/employees/export?department=Engineering&status=ACTIVE
+
+### Delete an employee
+DELETE {{baseUrl}}/api/employees/{{recordId}}

@@ -1,0 +1,71 @@
+{
+  "info": {
+    "name": "Employee Management",
+    "description": "Run Add employee first. It saves the returned record ID for the view, edit and delete requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "recordId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "List employees",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees?page=0&size=10" }
+    },
+    {
+      "name": "Search and filter employees",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees?search=rao&department=Engineering&status=ACTIVE&page=0&size=5" }
+    },
+    {
+      "name": "Add employee",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/employees",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": \"EMP-200\",\n  \"fullName\": \"Amit Shah\",\n  \"email\": \"amit.shah@example.com\",\n  \"phone\": \"+91 98765 43000\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Backend Developer\",\n  \"dateOfJoining\": \"2025-08-12\",\n  \"salary\": 600000.00,\n  \"status\": \"ACTIVE\"\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('Employee was added', () => pm.response.to.have.status(201));",
+        "if (pm.response.code === 201) pm.collectionVariables.set('recordId', pm.response.json().id);"
+      ] } }]
+    },
+    {
+      "name": "View employee",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/{{recordId}}" }
+    },
+    {
+      "name": "Edit employee",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/employees/{{recordId}}",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employeeId\": \"EMP-200\",\n  \"fullName\": \"Amit Shah\",\n  \"email\": \"amit.shah@example.com\",\n  \"phone\": \"+91 98765 43000\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Software Engineer\",\n  \"dateOfJoining\": \"2025-08-12\",\n  \"salary\": 650000.00,\n  \"status\": \"INACTIVE\"\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      }
+    },
+    {
+      "name": "List departments",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/departments" }
+    },
+    {
+      "name": "Employee counts",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/summary" }
+    },
+    {
+      "name": "Export CSV",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/employees/export?department=Engineering&status=ACTIVE" }
+    },
+    {
+      "name": "Delete employee",
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/api/employees/{{recordId}}" }
+    }
+  ]
+}

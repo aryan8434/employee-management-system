@@ -1,0 +1,12 @@
+{
+  "name": "employee-management-ui-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser tests for the employee management app.",
+  "scripts": {
+    "test:ui": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

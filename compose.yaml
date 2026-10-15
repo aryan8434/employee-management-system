@@ -1,0 +1,50 @@
+name: employee-management
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-employees}
+      POSTGRES_USER: ${POSTGRES_USER:-employee_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-employee_local}
+    ports:
+      - "127.0.0.1:${DB_PORT:-15432}:5432"
+    volumes:
+      - employee-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-employees}
+      DB_USER: ${POSTGRES_USER:-employee_app}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-employee_local}
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  tests:
+    image: maven:3.9-eclipse-temurin-17
+    profiles: [test]
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - maven-cache:/root/.m2
+    environment:
+      TEST_DB_URL: jdbc:postgresql://db:5432/employee_tests
+      TEST_DB_USER: ${POSTGRES_USER:-employee_app}
+      TEST_DB_PASSWORD: ${POSTGRES_PASSWORD:-employee_local}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["mvn", "-B", "-ntp", "verify", "-Pintegration"]
+
+volumes:
+  employee-data:
+  maven-cache:
