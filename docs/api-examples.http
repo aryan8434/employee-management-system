@@ -7,7 +7,7 @@ GET {{baseUrl}}/api/employees?page=0&size=10
 ### Search and filter together
 GET {{baseUrl}}/api/employees?search=rao&department=Engineering&status=ACTIVE&page=0&size=5
 
-### Add an employee. Use the returned numeric id in later requests.
+### Add an employee. Use the id from the reply in the next requests.
 POST {{baseUrl}}/api/employees
 Content-Type: application/json
 

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Employee Management",
-    "description": "Run Add employee first. It saves the returned record ID for the view, edit and delete requests.",
+    "description": "Run Add employee first. It saves the new record ID. The next requests use this ID to view, edit or delete the record.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

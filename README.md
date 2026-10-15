@@ -1,18 +1,21 @@
 # Employee Management
 
-A web app to keep employee records in one place. An admin can add, view, edit and delete employees. The app also has search, filters and pages for long lists.
+This is a simple app to manage employee records. An admin can add, view, edit and delete a record. The admin can also search for employees and filter the list.
 
-## What is included
+## Features
 
-- All nine employee fields from the assessment.
-- A list page, add form, edit form and details page.
-- Search by name or email, with department and status filters.
-- A check before deleting a record.
-- Checks for required fields, email format, salary and duplicate records.
-- PostgreSQL storage and database setup files.
-- REST APIs with Swagger UI and a Postman collection.
-- JUnit 5 and Mockito tests, plus PostgreSQL and browser tests.
-- CSV export and Docker Compose setup.
+- Add, view, edit and delete employees.
+- Save all nine fields given in the assignment.
+- Search by name or email.
+- Filter by department and status.
+- Show the employee list in pages.
+- Ask before deleting a record.
+- Show an error if a field is wrong or missing.
+- Stop the same email or employee ID from being used twice.
+- Save records in PostgreSQL.
+- Download the list as a CSV file.
+- View and try the APIs in Swagger UI or Postman.
+- Run the app with Docker Compose.
 
 ## Tools used
 
@@ -24,11 +27,11 @@ A web app to keep employee records in one place. An admin can add, view, edit an
 | Tests | JUnit 5, Mockito, MockMvc, Playwright |
 | Build and API guide | Maven, springdoc OpenAPI |
 
-The frontend is in `src/main/resources/static`. Spring Boot serves both the pages and the API. There is no separate frontend build.
+The frontend files are in `src/main/resources/static`. Spring Boot runs the frontend and backend together.
 
 ## Start with Docker
 
-You need Docker Desktop with Docker Compose. Start Docker before running these steps. Java, Maven and Node.js are not needed for this method.
+Install Docker Desktop and start it. Docker includes the tools needed to run the app. You do not need to install Java, Maven or Node.js for this method.
 
 1. Open a terminal in this project folder.
 2. Run:
@@ -37,17 +40,17 @@ You need Docker Desktop with Docker Compose. Start Docker before running these s
    docker compose up --build -d
    ```
 
-3. The first build needs internet access and may take a few minutes. Check the app log:
+3. The first build needs the internet. It may take a few minutes. To check if the app has started, run:
 
    ```sh
    docker compose logs -f app
    ```
 
-   Wait for `Started EmployeeApplication`. Press Ctrl+C to leave the log view. The app will keep running.
+   Wait until you see `Started EmployeeApplication`. Then press Ctrl+C. This closes the log view. The app keeps running.
 
 4. Open [http://localhost:8080](http://localhost:8080).
 
-The database and tables are made on the first start. The employee list starts empty. Records stay in a Docker volume when the app stops.
+The app creates the database tables on the first start. The employee list is empty at first. Docker keeps the saved records when you stop the app.
 
 To stop the app and keep the data:
 
@@ -55,9 +58,9 @@ To stop the app and keep the data:
 docker compose down
 ```
 
-## Load sample records
+## Add sample records
 
-This step is optional. It adds 12 sample employees with example email addresses. Running it again skips records that already exist.
+You can use this step to add 12 sample employees. These records use example email addresses. If you run the script again, it skips records that are already saved.
 
 On Windows PowerShell:
 
@@ -71,18 +74,18 @@ On macOS or Linux:
 sh scripts/load-demo.sh
 ```
 
-Refresh the page after loading the records.
+Refresh the page to see the sample employees.
 
 ## Run with local Java and Maven
 
-You need JDK 17 or later, Maven 3.6.3 or later, and PostgreSQL 17. This option can also use the database from Docker.
+For this method, install JDK 17 or later and Maven 3.6.3 or later. You also need PostgreSQL 17. You can use Docker to run PostgreSQL:
 
 ```sh
 docker compose up -d db
 mvn spring-boot:run
 ```
 
-Do not start the Docker `app` service at the same time as the local app on the same port. If it is running, use `docker compose stop app` first.
+If the Docker app is already running, stop it first with `docker compose stop app`. Then run the commands above. Both apps use port 8080, so they cannot run on that port at the same time.
 
 Default database settings:
 
@@ -93,13 +96,15 @@ Default database settings:
 | User | `employee_app` |
 | Password | `employee_local` |
 
-For a fresh PostgreSQL server, run this once as the `postgres` user:
+If you installed PostgreSQL yourself, run this once as the `postgres` user on a new setup:
 
 ```sh
 psql -U postgres -v ON_ERROR_STOP=1 -f database/setup-local.sql
 ```
 
-This makes the app user and both databases. If you already have a database user, you can instead make an empty database named `employees` owned by that user. Set `DB_URL`, `DB_USER` and `DB_PASSWORD` in your terminal before starting Maven. Flyway will create the tables.
+This script creates the app user and two databases. If you already have a user, you can create an empty database named `employees` for that user instead.
+
+Before starting Maven, set the database address, user and password in your terminal. The app uses Flyway to create the tables.
 
 Example in PowerShell:
 
@@ -112,18 +117,20 @@ mvn spring-boot:run
 
 ## Change Docker ports or settings
 
-Copy `.env.example` to `.env` and change the values you need. The default app port is `8080`; the database port is `15432`. For example, set `APP_PORT=8086` if port 8080 is busy, then open `http://localhost:8086`.
+Copy `.env.example` to a file named `.env`. Change the values in that file if needed. The app uses port `8080`. The database uses port `15432`.
 
-Run `docker compose up --build -d` after making changes. Database name, user and password apply when the database volume is first made. Changing these values later does not change an existing database user.
+If port 8080 is busy, set `APP_PORT=8086`. Then open `http://localhost:8086`.
 
-The Docker `.env` file is read by Docker Compose. A local Maven run reads the environment variables from your terminal. For a local app port, set `PORT`.
+Run `docker compose up --build -d` after changing the file. Docker sets the database name, user and password when it first creates the database. Changing the file later does not change a user that is already saved in the database.
+
+Docker Compose reads the `.env` file. When you run Maven yourself, set the values in your terminal. Use `PORT` to change the port for a local Maven run.
 
 ## API guide
 
 - Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 - Postman collection: `docs/employee-management.postman_collection.json`
-- Ready-to-use requests: `docs/api-examples.http`
+- Sample requests: `docs/api-examples.http`
 
 | Method | Path | Use |
 | --- | --- | --- |
@@ -142,22 +149,24 @@ Example:
 /api/employees?search=rao&department=Engineering&status=ACTIVE&page=0&size=5
 ```
 
-Pages start at `0`. Page size can be `1` to `100`. Results are sorted by name, then by record ID. Search matches part of a name or email and ignores letter case. The department filter also ignores case. All filters work together. CSV export uses the same filters and includes every matching row.
+Page numbers start at `0`. Each page can have `1` to `100` records. The list is sorted by name. If two names are the same, the record ID decides their order.
 
-The API returns a numeric `id` for each database record. Use that number in API paths. `employeeId`, such as `EMP-101`, is the separate ID shown on the employee form.
+You can search with part of a name or email. Capital and small letters give the same result. This also applies to the department filter. You can use search and both filters together. The CSV file includes all records that match these filters.
+
+Each saved record has a number called `id`. Use this number in an API path, such as `/api/employees/1`. The form has another field called `employeeId`. This is the employee's ID, such as `EMP-101`.
 
 ## Record rules
 
-- All fields are required. Text values are trimmed before they are saved.
-- Employee IDs can use up to 20 letters, numbers or hyphens. IDs are saved in upper case.
-- Emails are saved in lower case. Email and employee ID must each be unique, even if letter case differs.
-- Salary is an annual amount in INR. It can be zero or more, with up to two decimal places.
-- Phone numbers can include a leading `+`, spaces, brackets and hyphens. Use 7 to 20 characters.
+- Fill in every field. The app removes extra spaces from the start and end of text.
+- An employee ID can have up to 20 letters, numbers or hyphens. The app saves its letters as capital letters.
+- The app saves email addresses in small letters. Two employees cannot have the same email or employee ID. Changing capital letters to small letters does not make them different.
+- Salary means yearly salary in INR. It can be zero or more. It can have up to two digits after the decimal point.
+- A phone number can start with `+`. It can also have spaces, brackets and hyphens. Use 7 to 20 characters.
 - Dates use `YYYY-MM-DD`. Future joining dates are allowed.
 - Status must be `ACTIVE` or `INACTIVE`.
-- Department names are entered on the employee form. The filter list comes from the saved records.
+- Enter the department name in the employee form. Saved department names appear in the filter list.
 
-Bad input returns `400`, missing records return `404`, and duplicate records return `409`. Form errors appear next to the related field.
+The API returns `400` for wrong input and `404` if a record is not found. It returns `409` if an email or employee ID is already in use. The form shows an error next to the field that needs a change.
 
 ## Run the tests
 
@@ -179,7 +188,7 @@ To run all Java tests, including real PostgreSQL tests:
 docker compose --profile test run --rm tests
 ```
 
-The database setup creates `employee_tests` for these tests. They clear only that test database. The test setup checks that its database name ends in `_tests` before removing any rows.
+The setup creates a separate database named `employee_tests`. Database tests use and clear this database. Before clearing it, they check that its name ends in `_tests`.
 
 For a local Maven run, start the database and use:
 
@@ -187,7 +196,7 @@ For a local Maven run, start the database and use:
 mvn verify -Pintegration
 ```
 
-If you use your own PostgreSQL server, create `employee_tests` first. Set `TEST_DB_URL`, `TEST_DB_USER` and `TEST_DB_PASSWORD` to its details. Keep this database separate from employee data.
+If you use your own PostgreSQL server, create `employee_tests` first. Set its address, user and password with `TEST_DB_URL`, `TEST_DB_USER` and `TEST_DB_PASSWORD`. Keep test data in this separate database.
 
 Browser tests need Node.js 20 or later. Start the app, then run:
 
@@ -197,7 +206,7 @@ npx playwright install chromium
 npm run test:ui
 ```
 
-For a different app address, set `APP_URL`, for example `http://localhost:8086`. The browser tests add temporary records and remove them when each test ends.
+If the app uses a different address, set `APP_URL` to that address. For example, use `http://localhost:8086`. Browser tests add records for testing and delete them after each test.
 
 See `docs/test-results.md` for the checks run on this version.
 
@@ -218,7 +227,7 @@ docs/                   API requests, test notes and screenshots
 scripts/                Sample data scripts
 ```
 
-The controller reads each request. The service checks business rules. The repository reads and writes PostgreSQL. Database constraints also block duplicate records if two requests arrive at the same time.
+The controller receives an API request. The service checks the employee details. The repository reads and saves the data in PostgreSQL. The database also checks emails and employee IDs. This stops the same value from being saved twice, even when two requests come at the same time.
 
 ## Screenshots
 
@@ -232,6 +241,6 @@ The screenshots show the running app with the sample records.
 
 ## Notes
 
-This is a local assessment app. It has no login screen. CSV cells are escaped, and text that could run as a spreadsheet formula is stored as plain text in the export.
+This app runs on your computer. It has no login page. The CSV export handles commas and quotes in values. It also adds a single quote before text that could be read as a spreadsheet formula.
 
 Tool references: [Spring Boot setup](https://docs.spring.io/spring-boot/3.5/system-requirements.html) and [springdoc compatibility](https://springdoc.org/v2/).
